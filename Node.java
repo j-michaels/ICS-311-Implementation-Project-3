@@ -10,6 +10,7 @@ public class Node {
 	public Node right;
 	public Edge edge;
 	public double height;
+	public Vertex topVertex;
 	public int rank;
 	public int id;
 	public HashSet<Vertex> vertices;
@@ -44,10 +45,10 @@ public class Node {
 		}
 		return rverts;
 	}
-
+	
 	public void calcVertices() {
 		if (vertices == null) {
-			System.out.println("OOPS");
+			System.out.println("Debug: something went wrong.");
 		} else {
 			this.sortedVertices = new ArrayList<Vertex>(vertices);
 			DescendingComparator compr = new DescendingComparator();

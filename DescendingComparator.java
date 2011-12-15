@@ -46,7 +46,7 @@ class DescendingCommComparator implements Comparator<Node> {
 	public int compare(Node n1, Node n2) {
 		if (n1.vertices.size() > n2.vertices.size()) return -1;
 	      else if (n1.vertices.size() < n2.vertices.size()) return 1;
-	      return 0; /*equal*/
+	      return 0; 
 	}
 	
 }
@@ -58,7 +58,13 @@ class DescendingVertexComparator implements Comparator<Vertex> {
 	public int compare(Vertex v1, Vertex v2) {
 		if (v1.communities.size() > v2.communities.size()) return -1;
 	      else if (v1.communities.size() < v2.communities.size()) return 1;
-	      return 0; /*equal*/
+	      // Secondary sort by degree
+	      else {
+	    	  if (v1.degree() > v2.degree()) return -1;
+		      else if (v1.degree() < v2.degree()) return 1;
+	    	  return 0;
+	      }
+	      
 	}
 	
 }

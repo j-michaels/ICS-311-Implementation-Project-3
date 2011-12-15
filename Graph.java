@@ -19,6 +19,12 @@ public class Graph {
 	private ArrayList<ArrayList<Vertex>> sccArray;
 	private String fileName;
 	private Vertex source;
+	private int minInDegree;
+	private int minOutDegree;
+	private double avgInDegree;
+	private double avgOutDegree;
+	private int maxInDegree;
+	private int maxOutDegree;
 	
 	public Graph() {
 		edges = new ArrayList<Edge>();
@@ -65,7 +71,7 @@ public class Graph {
 						float w = Float.parseFloat(lines[2]);
 						//System.out.println("w: "+w);
 						
-						Edge e = new Edge(v1, v2, null, false, w); // assume edge is undirected
+						Edge e = new Edge(v1, v2, null, true, w); // assume edge is directed
 						edges.add(e);
 						//System.out.println("Edge " + e.origin().id() + "->" +e.destination().id() + ": " + e.getDist());
 					}
@@ -181,7 +187,9 @@ public class Graph {
 		}
 	}
 	
-	public void buildDendrogram() {
+	public void buildDendrogram(double threshold) {
+		System.out.println("Calculating pairs similarity.");
+		System.out.println("Threshold = " + threshold);
 		ArrayList<LinkPair> pairs = new ArrayList<LinkPair>();
 		
 		Iterator<Vertex> itr = vertices.iterator();
@@ -215,7 +223,9 @@ public class Graph {
 		DescendingLinkPairComparator compr = new DescendingLinkPairComparator();
 		Collections.sort(pairs, compr);
 		// Basic print of the similarities (for debug)
-		printPairs(pairs);
+		//printPairs(pairs);
+		
+		System.out.println("Building Dendrogram.");
 		
 		// cc means community count, it's just a way to give each node (community)
 		// a unique id number
@@ -226,7 +236,7 @@ public class Graph {
 			LinkPair pair = linkItr.next();
 			Node comm1 = pair.getLink1().community();
 			Node comm2 = pair.getLink2().community();
-			if (comm1 != comm2) {
+			if ((comm1 != comm2) && (pair.s() > threshold)) {
 				Node comm = new Node(cc);
 				cc++;
 			
@@ -234,7 +244,7 @@ public class Graph {
 				comm.left.p = comm;
 				comm.right = pair.getLink2().community();
 				comm.right.p = comm;
-			
+				
 				if (comm.right.vertices != null) comm.vertices.addAll(comm.right.vertices);
 				if (comm.left.vertices != null) comm.vertices.addAll(comm.left.vertices);
 				comm.left.vertices = null;
@@ -246,81 +256,57 @@ public class Graph {
 		HashSet<Node> communities = new HashSet<Node>();
 		Iterator<Edge> e_itr = edges.iterator();
 		while (e_itr.hasNext()) {
-			Edge e = e_itr.next();
-			Node community = e.community();
-			if (community.p != community) System.out.println("OOPS2"); 
-			communities.add(e.community());
+			communities.add(e_itr.next().community());
 			
 		}
-		Iterator<Node> c_itr = communities.iterator();
-		//while (c_itr.hasNext()) {
-			//c_itr.next().calcVertices();
-		//}
 		System.out.println("Number of communities: " + communities.size());
 		System.out.println("Top 20 Communities by size:");
-		System.out.println("ID Size Highest Degree Vertex");
+		System.out.println("ID	Size	Highest Degree Vertex");
 		
 		// Convert to ArrayList for sorting
 		ArrayList<Node> comms = new ArrayList<Node>(communities);
 		// then sort by community size (# of vertices)
 		DescendingCommComparator ccompr = new DescendingCommComparator();
 		Collections.sort(comms, ccompr);
-		c_itr = comms.iterator();
+		Iterator<Node> c_itr = comms.iterator();
 		int i = 0;
 		while (c_itr.hasNext()) {
 			i++;
 			if (i > 20) break;
 			Node c = c_itr.next();
-			// Vertices must have at least 3 elements in order for this
+			// Vertices must have at least 2 elements in order for this
 			// community Node to even exist
 			// So topv will never be null
 			c.calcVertices();
 			Vertex topv = c.sortedVertices.get(0);
-			System.out.println(c.id + ". "+c.vertices.size() + "	deg("+topv.getName()+") = "+topv.degree());
-			
-			//Iterator<Vertex> v_itr = c.vertices.iterator();
-			
+			System.out.println(" " + i + ".	"+c.vertices.size() + "	deg("+topv.getName()+") = "+topv.degree());
 		}
 		
+		
+		HashSet<Vertex> bridgeSet = new HashSet<Vertex>();
 		Iterator<Vertex> v_itr = vertices.iterator();
 		while (v_itr.hasNext()) {
-			v_itr.next().calcCommunities();
+			Vertex v = v_itr.next();
+			v.calcCommunities();
+			if (v.communities.size() > 1) {
+				bridgeSet.add(v);
+			}
 		}
+		ArrayList<Vertex> bridges = new ArrayList<Vertex>(bridgeSet);
+		System.out.println("Number of bridges: "+bridges.size());
+		System.out.println("Top 20 bridges: ");
+		System.out.println("ID	Vertex	Number of Communities	Degree");
 		DescendingVertexComparator vcompr = new DescendingVertexComparator();
-		Collections.sort(vertices, vcompr);
-		v_itr = vertices.iterator();
+		Collections.sort(bridges, vcompr);
+		v_itr = bridges.iterator();
 		i = 0;
 		while (v_itr.hasNext()) {
 			i++;
 			if (i>20) break;
 			Vertex v = v_itr.next();
 			ArrayList<Node> v_comms = v.findCommunities();
-			System.out.println("Vertex: "+v.getName()+", comms: "+v_comms.size());
+			System.out.println(" "+i+".	"+v.getName()+"	"+v_comms.size()+ "			"+v.degree());
 		}
-	}
-	
-	public void union(Node x, Node y) {
-		link(findSet(x), findSet(y));
-	}
-	
-	public void link(Node x, Node y) {
-		if (x.rank > y.rank){
-			y.p = x;
-		} else {
-			x.p = y;
-			if (x.rank == y.rank) {
-				y.rank++;
-			}
-		}
-	}
-	
-	// Find a the representative of a set
-	// compresses the path
-	public Node findSet(Node node) {
-		if (node != node.p) {
-			node.p = findSet(node.p);
-		}
-		return node.p;
 	}
 	
 	private void printPairs(ArrayList<LinkPair> pairs) {
@@ -561,6 +547,19 @@ public class Graph {
 		
 	}
 	
+public void finalPrint() {
+		
+		System.out.println("------------------------------------------------------------");
+		System.out.println("Graph " + fileName);
+		System.out.println("------------------------------------------------------------");
+		System.out.println("|V| = " + vertices.size());
+		System.out.println("|E| = " + edges.size());
+		System.out.println("Degree distribution:	minimum		average		max");
+		System.out.println("inDegree(v)		" + minInDegree + "		" + avgInDegree + "		" + maxInDegree);
+		System.out.println("outDegree(v)		" + minOutDegree + "		" + avgOutDegree + "		" + maxOutDegree);
+		
+	}
+	
 	public void setSource(Vertex s) {
 		this.source = s;
 	}
@@ -573,6 +572,44 @@ public class Graph {
 			if (v.getAnnotation("root").equals(true)) return v;
 		}
 		return null;
+	}
+	// arraylist doesn't have these basic functions built in + no anonymous functions
+	// = unhappy programmers
+	public void calcMinsMaxAvg() {
+		// TODO Auto-generated method stub
+		Iterator<Vertex> itr = vertices.iterator();
+		int minIn = -1;
+		int minOut = -1;
+		int maxIn = 0;
+		int maxOut = 0;
+		int sumIn = 0;
+		int sumOut = 0;
+		
+		while (itr.hasNext()) {
+			Vertex v = itr.next();
+			
+			if ((v.inDegree() < minIn) || (minIn == -1)) {
+				minIn = v.inDegree();
+			}
+			if ((v.outDegree() < minOut) || (minOut == -1)) {
+				minOut = v.outDegree();
+			}
+			if (v.inDegree() > maxIn) {
+				maxIn = v.inDegree();
+			}
+			if (v.outDegree() > maxOut) {
+				maxOut = v.outDegree();
+			}
+			sumIn += v.inDegree();
+			sumOut += v.outDegree();
+		}
+		
+		minInDegree = minIn;
+		minOutDegree = minOut;
+		maxInDegree = maxIn;
+		maxOutDegree = maxOut;
+		avgInDegree = (double)sumIn / vertices.size();
+		avgOutDegree = (double)sumOut / vertices.size();
 	}
 	
 	public void dijkstra(Vertex s) {

@@ -1,31 +1,12 @@
 package ics311;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
 public class LinkPair {
 	private Edge link1;
 	private Edge link2;
-	private Vertex impost1;
-	private Vertex impost2;
 	private double similarity;
-	private Vertex keystone;
-	public LinkPair p;
-	public int rank;
-	public ArrayList<LinkPair> children;
-	
-	public Vertex getKeystone() {
-		return keystone;
-	}
-	
-	public Vertex getImpost1() {
-		return impost1;
-	}
-	
-	public Vertex getImpost2() {
-		return impost2;
-	}
 	
 	public Edge getLink1() {
 		return link1;
@@ -45,28 +26,27 @@ public class LinkPair {
 	}
 	
 	public LinkPair(Edge e1, Edge e2) {
-		this.rank = 0;
-		children = new ArrayList<LinkPair>();
-		this.p = this;
+		Vertex impost1 = null;
+		Vertex impost2 = null;
 		this.link1 = e1;
 		this.link2 = e2;
 		// Find the impost nodes
 		if (e1.origin().equals(e2.origin())) {
 			impost1 = e1.destination();
 			impost2 = e2.destination();
-			keystone = e1.origin();
+			//keystone = e1.origin();
 		} else if (e1.destination().equals(e2.destination())) {
 			impost1 = e1.origin();
 			impost2 = e2.origin();
-			keystone = e1.destination();
+			//keystone = e1.destination();
 		} else if (e1.destination().equals(e2.origin())) {
 			impost1 = e1.origin();
 			impost2 = e2.destination();
-			keystone = e1.destination();
+			//keystone = e1.destination();
 		} else if (e1.origin().equals(e2.destination())) {
 			impost1 = e1.destination();
 			impost2 = e2.origin();
-			keystone = e1.origin();
+			//keystone = e1.origin();
 		}
 		
 		// add to sets to do set intersect and union
@@ -97,7 +77,7 @@ public class LinkPair {
 	
 	public void print() {
 		// TODO Auto-generated method stub
-		
+		System.out.println("Fooberries");
 		System.out.println(link1.printString() + " " + link2.printString() + ": " + this.similarity);
 	}
 }
