@@ -216,13 +216,26 @@ public class Graph {
 		Collections.sort(pairs, compr);
 		// Basic print of the similarities (for debug)
 		printPairs(pairs);
+		int cc = 1;
+		Iterator<LinkPair> linkItr = pairs.iterator();
+		while (linkItr.hasNext()) {
+			LinkPair pair = linkItr.next();
+			
+			
+			Node comm = new Node(cc);
+			
+			comm.left = pair.getLink1().community();
+			comm.right = pair.getLink2().community();
+			
+			comm.height = pair.s();
+		}
 	}
 	
-	public void union(LinkPair x, LinkPair y) {
+	public void union(Node x, Node y) {
 		link(findSet(x), findSet(y));
 	}
 	
-	public void link(LinkPair x, LinkPair y) {
+	public void link(Node x, Node y) {
 		if (x.rank > y.rank){
 			y.p = x;
 		} else {
@@ -235,11 +248,11 @@ public class Graph {
 	
 	// Find a the representative of a set
 	// compresses the path
-	public LinkPair findSet(LinkPair pair) {
-		if (pair != pair.p) {
-			pair.p = findSet(pair.p);
+	public Node findSet(Node node) {
+		if (node != node.p) {
+			node.p = findSet(node.p);
 		}
-		return pair.p;
+		return node.p;
 	}
 	
 	private void printPairs(ArrayList<LinkPair> pairs) {

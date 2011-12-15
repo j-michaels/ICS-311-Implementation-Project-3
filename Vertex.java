@@ -34,6 +34,18 @@ public class Vertex {
 		}
 	}
 	
+	public void findCommunities() {
+		HashSet<Edge> communities = new HashSet<Edge>();
+		Iterator<Edge> itr = incidentEdges.iterator();
+		while (itr.hasNext()) {
+			Edge e = itr.next();
+			
+			//communities.add(e.findSet(e));
+		}
+		
+		//Iterator<Edge> itr2 = communities.
+	}
+	
 	private HashSet<Vertex> buildVertSet() {
 		// TODO Auto-generated method stub
 		Iterator<Edge> itr = incidentEdges.iterator();

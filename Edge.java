@@ -9,6 +9,7 @@ public class Edge {
 	private Map<Object,Object> annotations;
 	private boolean directed;
 	private float distance;
+	public Node node;
 	
 	public Edge(Vertex u, Vertex v, Object info, boolean d, float w) {
 		this.distance = w;
@@ -18,6 +19,10 @@ public class Edge {
 		v.insertAdjacentEdge(this);
 		annotations = new HashMap<Object,Object>();
 		this.directed = d;
+	}
+	
+	public Node community() {
+		return node.findSet();
 	}
 	
 	public float getDist() {

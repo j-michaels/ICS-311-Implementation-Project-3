@@ -1,5 +1,6 @@
 package ics311;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -12,6 +13,7 @@ public class LinkPair {
 	private Vertex keystone;
 	public LinkPair p;
 	public int rank;
+	public ArrayList<LinkPair> children;
 	
 	public Vertex getKeystone() {
 		return keystone;
@@ -44,6 +46,7 @@ public class LinkPair {
 	
 	public LinkPair(Edge e1, Edge e2) {
 		this.rank = 0;
+		children = new ArrayList<LinkPair>();
 		this.p = this;
 		this.link1 = e1;
 		this.link2 = e2;
@@ -91,6 +94,7 @@ public class LinkPair {
 			similarity = 0;
 		}
 	}
+	
 	public void print() {
 		// TODO Auto-generated method stub
 		
