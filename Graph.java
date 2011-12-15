@@ -65,7 +65,7 @@ public class Graph {
 						float w = Float.parseFloat(lines[2]);
 						//System.out.println("w: "+w);
 						
-						Edge e = new Edge(v1, v2, null, true, w); // assume edge is directed
+						Edge e = new Edge(v1, v2, null, false, w); // assume edge is undirected
 						edges.add(e);
 						//System.out.println("Edge " + e.origin().id() + "->" +e.destination().id() + ": " + e.getDist());
 					}
@@ -216,6 +216,30 @@ public class Graph {
 		Collections.sort(pairs, compr);
 		// Basic print of the similarities (for debug)
 		printPairs(pairs);
+	}
+	
+	public void union(LinkPair x, LinkPair y) {
+		link(findSet(x), findSet(y));
+	}
+	
+	public void link(LinkPair x, LinkPair y) {
+		if (x.rank > y.rank){
+			y.p = x;
+		} else {
+			x.p = y;
+			if (x.rank == y.rank) {
+				y.rank++;
+			}
+		}
+	}
+	
+	// Find a the representative of a set
+	// compresses the path
+	public LinkPair findSet(LinkPair pair) {
+		if (pair != pair.p) {
+			pair.p = findSet(pair.p);
+		}
+		return pair.p;
 	}
 	
 	private void printPairs(ArrayList<LinkPair> pairs) {

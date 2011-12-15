@@ -10,6 +10,8 @@ public class LinkPair {
 	private Vertex impost2;
 	private double similarity;
 	private Vertex keystone;
+	public LinkPair p;
+	public int rank;
 	
 	public Vertex getKeystone() {
 		return keystone;
@@ -41,6 +43,8 @@ public class LinkPair {
 	}
 	
 	public LinkPair(Edge e1, Edge e2) {
+		this.rank = 0;
+		this.p = this;
 		this.link1 = e1;
 		this.link2 = e2;
 		// Find the impost nodes
@@ -90,6 +94,6 @@ public class LinkPair {
 	public void print() {
 		// TODO Auto-generated method stub
 		
-		System.out.print(link1.printString() + " " + link2.printString() + ": " + this.similarity);
+		System.out.println(link1.printString() + " " + link2.printString() + ": " + this.similarity);
 	}
 }
