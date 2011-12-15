@@ -1,5 +1,7 @@
 package ics311;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 
 public class Node {
@@ -11,9 +13,11 @@ public class Node {
 	public int rank;
 	public int id;
 	public HashSet<Vertex> vertices;
+	public ArrayList<Vertex> sortedVertices;
 	
 	public Node(int id) {
-		this.vertices = null;
+		this.vertices = new HashSet<Vertex>();
+		this.sortedVertices = null;
 		this.id = id;
 		p = this;
 		left = null;
@@ -42,7 +46,12 @@ public class Node {
 	}
 
 	public void calcVertices() {
-		// TODO Auto-generated method stub
-		this.vertices = findVertices();
+		if (vertices == null) {
+			System.out.println("OOPS");
+		} else {
+			this.sortedVertices = new ArrayList<Vertex>(vertices);
+			DescendingComparator compr = new DescendingComparator();
+			Collections.sort(sortedVertices, compr);
+		}
 	}
 }

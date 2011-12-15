@@ -224,40 +224,61 @@ public class Graph {
 		Iterator<LinkPair> linkItr = pairs.iterator();
 		while (linkItr.hasNext()) {
 			LinkPair pair = linkItr.next();
+			Node comm1 = pair.getLink1().community();
+			Node comm2 = pair.getLink2().community();
+			if (comm1 != comm2) {
+				Node comm = new Node(cc);
+				cc++;
 			
-			Node comm = new Node(cc);
-			cc++;
+				comm.left = pair.getLink1().community();
+				comm.left.p = comm;
+				comm.right = pair.getLink2().community();
+				comm.right.p = comm;
 			
-			comm.left = pair.getLink1().community();
-			comm.left.p = comm;
-			comm.right = pair.getLink2().community();
-			comm.left.p = comm;
+				if (comm.right.vertices != null) comm.vertices.addAll(comm.right.vertices);
+				if (comm.left.vertices != null) comm.vertices.addAll(comm.left.vertices);
+				comm.left.vertices = null;
+				comm.right.vertices = null;
 			
-			comm.height = pair.s();
+				comm.height = pair.s();
+			}
 		}
 		HashSet<Node> communities = new HashSet<Node>();
 		Iterator<Edge> e_itr = edges.iterator();
 		while (e_itr.hasNext()) {
 			Edge e = e_itr.next();
-			
+			Node community = e.community();
+			if (community.p != community) System.out.println("OOPS2"); 
 			communities.add(e.community());
-			e.community().calcVertices();
+			
 		}
-		System.out.println("Total communities: " + communities.size());
+		Iterator<Node> c_itr = communities.iterator();
+		//while (c_itr.hasNext()) {
+			//c_itr.next().calcVertices();
+		//}
+		System.out.println("Number of communities: " + communities.size());
+		System.out.println("Top 20 Communities by size:");
+		System.out.println("ID Size Highest Degree Vertex");
 		
 		// Convert to ArrayList for sorting
 		ArrayList<Node> comms = new ArrayList<Node>(communities);
 		// then sort by community size (# of vertices)
 		DescendingCommComparator ccompr = new DescendingCommComparator();
 		Collections.sort(comms, ccompr);
-		Iterator<Node> c_itr = comms.iterator();
+		c_itr = comms.iterator();
 		int i = 0;
 		while (c_itr.hasNext()) {
 			i++;
 			if (i > 20) break;
 			Node c = c_itr.next();
-			System.out.println("Community: " + c.id+ ", size: "+c.vertices.size());
-			Iterator<Vertex> v_itr = c.vertices.iterator();
+			// Vertices must have at least 3 elements in order for this
+			// community Node to even exist
+			// So topv will never be null
+			c.calcVertices();
+			Vertex topv = c.sortedVertices.get(0);
+			System.out.println(c.id + ". "+c.vertices.size() + "	deg("+topv.getName()+") = "+topv.degree());
+			
+			//Iterator<Vertex> v_itr = c.vertices.iterator();
 			
 		}
 		
