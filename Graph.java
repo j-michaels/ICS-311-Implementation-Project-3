@@ -216,18 +216,65 @@ public class Graph {
 		Collections.sort(pairs, compr);
 		// Basic print of the similarities (for debug)
 		printPairs(pairs);
+		
+		// cc means community count, it's just a way to give each node (community)
+		// a unique id number
 		int cc = 1;
+		System.out.println("Total pairs: "+pairs.size());
 		Iterator<LinkPair> linkItr = pairs.iterator();
 		while (linkItr.hasNext()) {
 			LinkPair pair = linkItr.next();
 			
-			
 			Node comm = new Node(cc);
+			cc++;
 			
 			comm.left = pair.getLink1().community();
+			comm.left.p = comm;
 			comm.right = pair.getLink2().community();
+			comm.left.p = comm;
 			
 			comm.height = pair.s();
+		}
+		HashSet<Node> communities = new HashSet<Node>();
+		Iterator<Edge> e_itr = edges.iterator();
+		while (e_itr.hasNext()) {
+			Edge e = e_itr.next();
+			
+			communities.add(e.community());
+			e.community().calcVertices();
+		}
+		System.out.println("Total communities: " + communities.size());
+		
+		// Convert to ArrayList for sorting
+		ArrayList<Node> comms = new ArrayList<Node>(communities);
+		// then sort by community size (# of vertices)
+		DescendingCommComparator ccompr = new DescendingCommComparator();
+		Collections.sort(comms, ccompr);
+		Iterator<Node> c_itr = comms.iterator();
+		int i = 0;
+		while (c_itr.hasNext()) {
+			i++;
+			if (i > 20) break;
+			Node c = c_itr.next();
+			System.out.println("Community: " + c.id+ ", size: "+c.vertices.size());
+			Iterator<Vertex> v_itr = c.vertices.iterator();
+			
+		}
+		
+		Iterator<Vertex> v_itr = vertices.iterator();
+		while (v_itr.hasNext()) {
+			v_itr.next().calcCommunities();
+		}
+		DescendingVertexComparator vcompr = new DescendingVertexComparator();
+		Collections.sort(vertices, vcompr);
+		v_itr = vertices.iterator();
+		i = 0;
+		while (v_itr.hasNext()) {
+			i++;
+			if (i>20) break;
+			Vertex v = v_itr.next();
+			ArrayList<Node> v_comms = v.findCommunities();
+			System.out.println("Vertex: "+v.getName()+", comms: "+v_comms.size());
 		}
 	}
 	

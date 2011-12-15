@@ -12,6 +12,8 @@ public class Edge {
 	public Node node;
 	
 	public Edge(Vertex u, Vertex v, Object info, boolean d, float w) {
+		this.node = new Node(0);
+		this.node.edge = this;
 		this.distance = w;
 		this.u = u;
 		this.v = v;

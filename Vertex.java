@@ -14,10 +14,12 @@ public class Vertex {
 	private boolean infiniteDistance;
 	private Vertex previous;
 	private HashSet<Vertex> adjacentVerticesSet;
+	public ArrayList<Node> communities;
 	
 	ArrayList<Edge> incidentEdges;
 	
 	public Vertex(String name) {
+		communities = new ArrayList<Node>();
 		incidentEdges = new ArrayList<Edge>();
 		this.name = name;
 		annotations = new HashMap<Object,Object>();
@@ -34,15 +36,20 @@ public class Vertex {
 		}
 	}
 	
-	public void findCommunities() {
-		HashSet<Edge> communities = new HashSet<Edge>();
+	public void calcCommunities() {
+		communities = findCommunities();
+	}
+	
+	public ArrayList<Node> findCommunities() {
+		HashSet<Node> comms = new HashSet<Node>();
 		Iterator<Edge> itr = incidentEdges.iterator();
 		while (itr.hasNext()) {
 			Edge e = itr.next();
 			
-			//communities.add(e.findSet(e));
+			comms.add(e.community());
 		}
 		
+		return new ArrayList<Node>(comms);
 		//Iterator<Edge> itr2 = communities.
 	}
 	

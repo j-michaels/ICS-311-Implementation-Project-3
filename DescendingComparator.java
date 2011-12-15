@@ -38,3 +38,27 @@ class DescendingLinkPairComparator implements Comparator<LinkPair> {
 	}
 	
 }
+
+class DescendingCommComparator implements Comparator<Node> {
+
+	@Override
+	//Compare based on the LinkPair's similarity
+	public int compare(Node n1, Node n2) {
+		if (n1.vertices.size() > n2.vertices.size()) return -1;
+	      else if (n1.vertices.size() < n2.vertices.size()) return 1;
+	      return 0; /*equal*/
+	}
+	
+}
+
+class DescendingVertexComparator implements Comparator<Vertex> {
+
+	@Override
+	//Compare based on the LinkPair's similarity
+	public int compare(Vertex v1, Vertex v2) {
+		if (v1.communities.size() > v2.communities.size()) return -1;
+	      else if (v1.communities.size() < v2.communities.size()) return 1;
+	      return 0; /*equal*/
+	}
+	
+}
